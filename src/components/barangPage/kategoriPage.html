@@ -1,0 +1,104 @@
+<v-app id="inspire" class='white'>
+    <v-flex xs10 offset-xs1>
+        <template>
+            <h3 class="headline">Daftar Kategori</h3>
+            <v-data-table
+                v-bind:headers="kategorisHeaders"
+                :items="kategoris"
+                class="elevation-1"
+                hide-actions
+                dark
+                expand
+              >
+              <template slot="items" slot-scope="props">
+                <td class="text-xs-left">
+                    <p>{{props.index + 1}}</p>
+                </td>
+                <td class="text-xs-left">
+                    <v-text-field
+                        :name="'input-nama-' + props.item.index"
+                        v-model="props.item.nama"
+                        label="Nama"
+                        single-line
+                    ></v-text-field>
+                </td>
+                <td class="text-xs-left">
+                    <v-text-field
+                        :name="'input-index-' + props.item.index"
+                        v-model="props.item.index"
+                        label="No. Indeks"
+                        single-line
+                    ></v-text-field>
+                </td>
+                <td class="text-xs-left">
+                    <v-text-field
+                        :name="'input-icon-' + props.item.index"
+                        v-model="props.item.icon"
+                        label="Nama Icon"
+                        single-line
+                    ></v-text-field>
+                </td>
+                <td  class="text-xs-left"><v-icon>{{ props.item.icon }}</v-icon></td>
+                <td class="text-xs-left">
+                    <v-btn @click.stop="hapus(props.item)">Hapus</v-btn>
+                </td>
+              </template>
+            </v-data-table>
+        </template>
+        <v-btn large class="red white--text" @click.stop="simpan()">Simpan</v-btn>
+        <br/>
+        <br/>
+        <v-card dark>
+            <v-card-text>
+                <v-container fluid>
+                    <h1>Kategori Baru</h1>
+                    <v-layout row>
+                        <v-flex xs12 sm8 offset-sm2>
+                            <v-text-field
+                                v-model="newkategori.nama"
+                                label="Nama"
+                                single-line
+                            ></v-text-field>
+                        </v-flex>
+                    </v-layout>
+                    <v-layout row>
+                        <v-flex xs12 sm8 offset-sm2>
+                            <v-text-field
+                                v-model="newkategori.index"
+                                label="No. Indeks"
+                                single-line
+                            ></v-text-field>
+                        </v-flex>
+                    </v-layout>
+                    <v-layout row align-center>
+                        <v-flex xs8 sm6 offset-sm2>
+                            <v-text-field
+                                v-model="newkategori.icon"
+                                label="Nama Ikon"
+                                single-line
+                            ></v-text-field>
+                        </v-flex>
+                        <v-flex xs4 sm4 class="text-sm-left">
+                            <v-icon>{{ newkategori.icon }}</v-icon>
+                        </v-flex>
+                    </v-layout>
+                    <v-layout row>
+                        <v-flex xs12 sm8 offset-sm2 class="text-sm-left">
+                            * Ikon dapat dilihat di: 
+                            <a target="_blank" href="http://fontawesome.io/icons/">fontawesome-icons</a> 
+                            atau 
+                            <a target="_blank" href="https://material.io/icons/">material-icons</a>
+                        </v-flex>
+                    </v-layout>
+                </v-container>
+            </v-card-text>
+            <v-card-actions>
+                <v-layout row>
+                    <v-flex xs4 offset-xs4>
+                        <v-btn class="white--text" @click.stop="tambah()">Tambah</v-btn>
+                    </v-flex>
+                </v-layout>
+            </v-card-actions>
+        </v-card>
+    </v-flex>
+</v-app>

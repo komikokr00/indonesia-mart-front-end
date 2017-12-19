@@ -1,0 +1,43 @@
+<v-content>
+    <v-flex xs10 offset-xs1 sm8 offset-sm2 md4 offset-md4>
+        <v-card color="grey lighten-4">
+            <v-card-title primary-title class="mb-0 mt-0 pb-0">
+                <v-container class="mb-0 pb-0">
+                    <h3 class="headline mb-0">Login</h3>
+                </v-container>
+            </v-card-title>
+            <v-card-text>
+                <v-container fluid>
+                    <v-layout row>
+                        <v-flex>
+                            <v-text-field
+                                label="Nama / Email"
+                                v-model="email"
+                                :rules="[rules.required, rules.email]"
+                                id="nama"
+                            ></v-text-field>
+                        </v-flex>
+                    </v-layout>
+                    <v-layout row>
+                        <v-flex>
+                            <v-text-field
+                                label="Masukkan kata kunci"
+                                v-model="password"
+                                :rules="[rules.required, rules.password]"
+                                :append-icon="e1 ? 'visibility' : 'visibility_off'"
+                                :append-icon-cb="() => (e1 = !e1)"
+                                :type="e1 ? 'password' : 'text'"
+                            ></v-text-field>
+                        </v-flex>
+                    </v-layout>
+                </v-container>
+            </v-card-text>
+            <v-card-actions>
+                <div>
+                    <v-btn flat @click.stop="$router.replace('/')">Kembali</v-btn>
+                    <v-btn flat @click.stop="onLoginClick()">Login</v-btn>
+                </div>
+            </v-card-actions>
+        </v-card>
+    </v-flex>
+</v-content>

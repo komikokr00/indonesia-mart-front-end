@@ -1,0 +1,70 @@
+<v-content>
+    <v-flex xs10 offset-xs1 sm8 offset-sm2>
+        <v-card>
+            <v-card-title primary-title class="mb-0 mt-0 pb-0">
+                <v-container class="mb-0 pb-0">
+                    <h3 class="headline mb-0">Data Admin</h3>
+                </v-container>
+            </v-card-title>
+            <v-card-text v-if="dataAdmin !== null && dataAdmin !== undefined">
+                <v-container fluid>
+                    <v-layout row>
+                        <v-flex>
+                            <v-text-field
+                                label="Nama Singkat"
+                                v-model="dataAdmin.nama"
+                            ></v-text-field>
+                        </v-flex>
+                    </v-layout>
+                    <v-layout row>
+                        <v-flex>
+                            <v-text-field
+                                label="Email"
+                                v-model="dataAdmin.email"
+                                :rules="[rules.required, rules.email]"
+                            ></v-text-field>
+                        </v-flex>
+                    </v-layout>
+                    <v-layout row>
+                        <v-flex>
+                            <v-text-field
+                                label="Telepon"
+                                v-model="dataAdmin.telepon"
+                            ></v-text-field>
+                        </v-flex>
+                    </v-layout>
+                    <v-layout row>
+                        <v-flex>
+                            <v-text-field
+                                label="No. Akun Bank"
+                                v-model="dataAdmin.akunno"
+                            ></v-text-field>
+                        </v-flex>
+                    </v-layout>
+                    <v-layout row>
+                        <v-flex>
+                            <v-text-field
+                                label="Nama Bank"
+                                v-model="dataAdmin.akunbank"
+                            ></v-text-field>
+                        </v-flex>
+                    </v-layout>
+                    <v-layout row>
+                        <v-flex>
+                            <v-text-field
+                                label="Nama di Akun Bank"
+                                v-model="dataAdmin.akunnama"
+                            ></v-text-field>
+                        </v-flex>
+                    </v-layout>
+                </v-container>
+            </v-card-text>
+            <v-card-actions>
+                <div>
+                    <v-btn flat @click.stop="onKembaliClick()">Kembali</v-btn>
+                    <v-btn flat @click.stop="onSetClick()">Set</v-btn>
+                </div>
+            </v-card-actions>
+        </v-card>
+    </v-flex>
+</v-content>

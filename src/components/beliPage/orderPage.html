@@ -1,0 +1,177 @@
+<v-content>
+    <br />
+    <v-flex xs10 offset-xs1 sm8 offset-sm2 md4 offset-md4
+        v-if="orderCheck === null || orderCheck === undefined">
+        <v-card color="grey lighten-4">
+            <v-card-title primary-title class="mb-0 mt-0 pb-0">
+                <v-container class="mb-0 pb-0">
+                    <h3 class="headline mb-0">Pesanan No. {{orderId}}</h3>
+                </v-container>
+            </v-card-title>
+            <v-card-text>
+                <v-container fluid>
+                    <v-form v-model="kodevalid">
+                        <v-layout row>
+                            <v-flex>
+                                <v-text-field
+                                    label="Nama / Email"
+                                    v-model="email"
+                                    :rules="[rules.required, rules.email]"
+                                    id="email"
+                                ></v-text-field>
+                            </v-flex>
+                        </v-layout>
+                        <v-layout row>
+                            <v-flex>
+                                <v-text-field
+                                    label="Kode"
+                                    v-model="kode"
+                                    :rules="[rules.required, rules.kode]"
+                                ></v-text-field>
+                            </v-flex>
+                        </v-layout>
+                    </v-form>
+                </v-container>
+            </v-card-text>
+            <v-card-actions>
+                <div>
+                    <v-btn flat @click.stop="onKembali">Kembali</v-btn>
+                    <v-btn @click.stop="onClickCek()" class="blue white--text" :disabled="!kodevalid">Cek Pesanan</v-btn>
+                </div>
+            </v-card-actions>
+        </v-card>
+    </v-flex>
+    <v-flex xs10 offset-xs1 v-if="orderCheck !== null && orderCheck !== undefined">
+        <h2>Pesanan</h2>
+        <div class="subheading">{{orderCheck.id}}</div>
+        <br />
+        <h2 class="text-xs-left">Status</h2>
+        <v-list>
+            <v-list-tile>
+                <v-list-tile-content>
+                    <v-list-tile-title>Pembayaran</v-list-tile-title>
+                    <v-list-tile-sub-title>
+                        <div class="subtitle" v-if="orderCheck.bayar">Pembayaran telah dikirim / diterima</div>
+                        <div class="subtitle" v-else>Dalam Proses Pembayaran</div>
+                    </v-list-tile-sub-title>
+                </v-list-tile-content>
+            </v-list-tile>
+            <v-divider></v-divider>
+            <v-list-tile>
+                <v-list-tile-content>
+                    <v-list-tile-title>Pengiriman</v-list-tile-title>
+                    <v-list-tile-sub-title>
+                        <div class="subtitle" v-if="orderCheck.kirim">Dalam Proses Pengiriman</div>
+                        <div class="subtitle" v-else>Belum Dikirim</div>
+                    </v-list-tile-sub-title>
+                </v-list-tile-content>
+            </v-list-tile>
+            <v-divider></v-divider>
+            <v-list-tile>
+                <v-list-tile-content>
+                    <v-list-tile-title>Penerimaan</v-list-tile-title>
+                    <v-list-tile-sub-title>
+                        <div class="subtitle" v-if="orderCheck.sampai">Telah Diterima</div>
+                        <div class="subtitle" v-else>Belum Diterima</div>
+                    </v-list-tile-sub-title>
+                </v-list-tile-content>
+            </v-list-tile>
+        </v-list>
+        <br />
+        <h2 class="text-xs-left">Daftar Pembelian</h2>
+        <v-divider></v-divider>
+        <v-data-table class="hidden-sm-and-down"
+            no-data-text="Tidak ada pembelian"
+            :items="orderCheck.barangs"
+            hide-actions>
+            <template slot="headers" slot-scope="props">
+                <tr class="text-xs-left subheading">
+                <td>No.</td>
+                <td class="ml-0 mr-0 pl-0 pr-0">Nama</td>
+                <td class="ml-0 mr-0 pl-0 pr-0">Harga (KRW)</td>
+                <td class="text-xs-center ml-0 mr-0 pl-0 pr-0">Jumlah</td>
+                <td class="text-xs-right ml-0 mr-0 pl-0 pr-0">Total (KRW)</td>
+                </tr>
+            </template>
+            <template slot="items" slot-scope="props">
+                <tr @click="props.expanded = !props.expanded" style="vertical-align: baseline;">
+                    <td class="text-xs-left subheading">
+                        <p>{{props.index + 1}}</p>
+                    </td>
+                    <td class="text-xs-left subheading ml-0 mr-0 pl-0 pr-0">
+                        <p>{{props.item.nama}}</p>
+                    </td>
+                    <td class="text-xs-left subheading ml-0 mr-0 pl-0 pr-0">
+                        <p>{{parseInt(props.item.harga).toLocaleString('ko-KR')}}</p>
+                    </td>
+                    <td class="text-xs-center subheading ml-0 mr-0 pl-0 pr-0">
+                        <span class="mt-0 mb-0">{{props.item.jumlah}}</span>
+                    </td>
+                    <td class="text-xs-right subheading ml-0 mr-0 pl-0 pr-0">
+                        <p>{{calcSubTotal(props.item).toLocaleString('ko-KR')}}</p>
+                    </td>
+                </tr>
+            </template>
+            <template slot="expand" slot-scope="props" class="text-xs-center">
+                <v-card flat>
+                    <v-card-media :src="props.item.img" height="50px" contain class="mt-1"></v-card-media>
+                    <v-card-text>
+                        <div>Kategori: {{getKategoriNama(props.item)}}</div>
+                        <div>Nama: {{props.item.nama}}</div>
+                        <div>{{props.item.detil}}</div>
+                    </v-card-text>
+                </v-card>
+            </template>
+        </v-data-table>
+        <v-list three-line class="hidden-md-and-up">
+            <template v-for="barang, i in orderCheck.barangs">
+                <v-list-tile avatar v-bind:key="barang.id">
+                    <span class="mr-2">{{i+1}}</span>
+                    <v-list-tile-content @click="onImgClick(barang)">
+                        <v-list-tile-title v-html="barang.nama"></v-list-tile-title>
+                        <v-list-tile-sub-title>
+                            <div class="subtitle">{{parseInt(barang.harga).toLocaleString('ko-KR')}}</div>
+                            <div class="subtitle">{{parseInt(barang.harga * barang.jumlah).toLocaleString('ko-KR')}}</div>
+                        </v-list-tile-sub-title>
+                    </v-list-tile-content>
+                    <v-list-tile-action class="align-center">
+                        <v-btn large icon>
+                            {{barang.jumlah}}
+                        </v-btn>
+                    </v-list-tile-action>
+                </v-list-tile>
+                <v-divider></v-divider>
+            </template>
+        </v-list>
+        <template>
+            <v-layout row wrap class="white subheading pb-2 pt-2">
+                <v-flex xs12 sm4 class="text-sm-right">Kemasan:</v-flex>
+                <v-flex xs12 sm4>{{orderCheck.kemasan.nama}}</v-flex>
+                <v-flex xs12 sm4 class="text-sm-left">(+ KRW {{orderCheck.kemasan.harga.toLocaleString('ko-KR')}})</v-flex>
+                <v-flex xs12 sm10 offset-sm2><v-divider></v-divider></v-flex>
+            </v-layout>
+            <v-layout row wrap class="white title pb-2 pt-2">
+                <v-flex xs12 sm8 class="text-sm-right">Total Biaya: </v-flex>
+                <v-flex xs12 sm4 class="text-sm-left pl-2">KRW {{orderCheck.biaya.toLocaleString('ko-KR')}}</v-flex>
+            </v-layout>
+        </template>
+        <br/>
+        <h2 class="text-xs-left">Data Pembeli</h2>
+        <v-layout row wrap v-for="itm, i in plist" key="i">
+            <v-flex d-flex xs12>
+                <v-card flat>
+                    <v-card-title primary class="subheading pl-0 mt-0 pt-0 mb-0 pb-0"><b>{{itm.header}}</b></v-card-title>
+                    <v-card-text class="text-xs-left subheading mt-0 pt-0 mb-2 pb-0">
+                        {{itm.content}}
+                    </v-card-text>
+                    <v-card-text v-if="itm.content2" class="text-xs-left subheading mt-0 pt-0 mb-2 pb-0">
+                        {{itm.content2}}
+                    </v-card-text>
+                </v-card>
+            </v-flex>
+        </v-layout>
+        <br />
+        <v-btn @click.stop="onKembali()">OK</v-btn>
+    </v-flex>
+    <br /><br /><br />
+</v-content>

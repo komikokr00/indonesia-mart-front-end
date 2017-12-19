@@ -1,0 +1,215 @@
+<v-content>
+    <v-layout row>
+        <v-flex class="ml-2 mr-2">
+            <v-card flat class="card--flex-toolbar">
+            <v-toolbar card class="grey lighten-5" prominent>
+                <v-toolbar-title class="title" ref="contentRef">{{kategoriNama}}</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon @click.stop="listMode = true">
+                <v-icon>list</v-icon>
+                </v-btn>
+                <v-btn icon @click.stop="listMode = false">
+                <v-icon>apps</v-icon>
+                </v-btn>
+            </v-toolbar>
+            </v-card>
+        </v-flex>
+    </v-layout>
+    <v-container fluid v-if="kategoriLoading">
+        <v-layout
+          justify-center
+          align-center
+        >
+            <v-progress-circular indeterminate size="100" color="red"></v-progress-circular>
+        </v-layout>
+    </v-container>
+    <v-container v-else fluid grid-list-md>
+        <v-layout row wrap ref="barangContainerRef">
+            <v-flex 
+            d-flex xs12 sm6 md4 xl3
+            v-for="(barang, i) in barangItems"
+            :key="i"
+            >
+                <v-card>
+                    <v-container fluid grid-list-lg v-if="!listMode">
+                        <v-card-media :src="barang.img" height="150px" contain @click.stop="onImgClick(barang)" style="cursor:pointer;"></v-card-media>
+                        <v-card-text class="mb-0 pb-0">
+                            <p class="title blue-grey--text text--darken-3">{{barang.nama}}</p>
+                            <div class="subheading grey--text text--darken-2 mb-0 pb-0 mt-0 pt-0">{{parseInt(barang.harga).toLocaleString('ko-KR')}} won</div>
+                        </v-card-text>
+                        <v-card-actions class="white mt-0 pt-0 mb-0 pb-0">
+                            <v-icon class="pink--text">favorite</v-icon>
+                            <span class="subtitle">{{barang.likes}}</span>
+                            <v-spacer></v-spacer>
+                            <v-btn icon @click.stop="jmlMin(barang)">
+                            <v-icon>remove</v-icon>
+                            </v-btn>
+                            <span class="title">{{barang.jumlah}}</span>
+                            <v-btn icon @click.stop="jmlPlus(barang)">
+                            <v-icon>add</v-icon>
+                            </v-btn>
+                        </v-card-actions>
+                        <template v-if="isAdmin">
+                            <v-card-actions>
+                                <v-btn @click.stop="onEditClick(barang, i)">
+                                    edit
+                                </v-btn>
+                            </v-card-actions>
+                            <v-card-text class="mb-0 mt-0 pb-0 pt-0">jenis: {{barang.jenis}}</v-card-text>
+                            <v-card-text class="mb-0 mt-0 pb-0 pt-0">perusahaan: {{barang.perusahaan}}</v-card-text>
+                        </template>
+                    </v-container>
+                    <v-list v-else three-line>
+                        <v-list-tile avatar v-bind:key="barang.id" @click="onImgClick(barang)">
+                            <v-list-tile-avatar>
+                                <img v-bind:src="barang.img"/>
+                            </v-list-tile-avatar>
+                            <v-list-tile-content>
+                                <v-list-tile-title>{{barang.nama}}</v-list-tile-title>
+                                <v-list-tile-sub-title>
+                                    {{parseInt(barang.harga).toLocaleString('ko-KR')}} won
+                                    <v-spacer></v-spacer>
+                                    <v-icon class="pink--text">favorite</v-icon>
+                                    <span class="subtitle">{{barang.likes}}</span>
+                                </v-list-tile-sub-title>
+                            </v-list-tile-content>
+                            <v-list-tile-action class="align-center">
+                                <v-btn icon @click.stop="jmlPlus(barang)">
+                                    <v-icon>add</v-icon>
+                                </v-btn>
+                                <span>{{barang.jumlah}}</span>
+                                <v-btn icon @click.stop="jmlMin(barang)">
+                                    <v-icon>remove</v-icon>
+                                </v-btn>
+                            </v-list-tile-action>
+                        </v-list-tile>
+                    </v-list>
+                </v-card>
+            </v-flex>
+        </v-layout>
+    </v-container>
+    <v-progress-circular indeterminate size="50" color="red" v-if="showLoading"></v-progress-circular>
+    <br /><br /><br /><br />
+    <v-btn fixed bottom right
+        large
+        class="red darken-1 white--text"
+        @click.stop="$router.push('/beli')"
+        :disabled="barangsBeliJumlah > 0 ? false : true">
+        <v-badge left>
+            <span slot="badge" v-if="barangsBeliJumlah > 0 ? true : false">{{barangsBeliJumlah}}</span>
+            <v-icon>shopping_cart</v-icon>
+            <span class="ml-0 pl-0 mr-0 pr-0">{{ barangsBeliTotalHarga.toLocaleString('ko-KR') }} (+ 
+                <span v-if="kemasan.harga > 0">
+                    {{kemasan.harga.toLocaleString('ko-KR')}}
+                </span>
+                <span v-else>
+                    Biaya Kirim
+                </span>) won
+            </span>
+            </v-tooltip>
+        </v-badge>
+    </v-btn>
+    <v-dialog
+        v-model="dialog"
+        max-width="500px">
+        <v-card>
+            <v-flex xs12 class="text-xs-right">
+                <v-btn icon @click.stop="dialog=false">
+                    <v-icon>close</v-icon>
+                </v-btn>
+            </v-flex>
+            <v-card-media :src="dBarang.img" height="200px" contain></v-card-media>
+            <v-card-title>
+                <v-flex xs12>
+                    <p class="headline mb-0">{{dBarang.nama}}</p>
+                </v-flex>
+            </v-card-title>
+            <v-card-text class="grey lighten-3">
+                <div class="title">{{dBarang.detil}}</div>
+                <div>Harga: {{parseInt(dBarang.harga).toLocaleString('ko-KR')}} won*</div>
+                <div>*Belum termasuk biaya kirim</div>
+            </v-card-text>
+        </v-card>
+    </v-dialog>
+    <v-dialog
+        v-if="isAdmin"
+        v-model="dialogedit"
+        max-width="500px">
+        <v-card>
+            <v-flex xs12 class="text-xs-right">
+                <v-btn icon @click.stop="dialogedit = false">
+                    <v-icon>close</v-icon>
+                </v-btn>
+            </v-flex>
+            <v-layout row wrap class="align-center">
+                <v-flex xs12 md6>
+                    <v-card-media
+                        :src="dBarang.img"
+                        height="100px"
+                        contain
+                    ></v-card-media>
+                    <v-card-text class="pb-0 pt-0">
+                        <v-text-field
+                            v-model="dBarang.nama"
+                            label="Nama"
+                        ></v-text-field>
+                    </v-card-text>
+                    <v-card-text class="pb-0 pt-0">
+                        <v-select
+                            :items="kategorisItems"
+                            item-text="nama"
+                            item-value="id"
+                            v-model="dBarang.kategori"
+                            label="Kategori"
+                            bottom
+                        ></v-select>
+                    </v-card-text>
+                    <v-card-text class="pb-0 pt-0">
+                        <v-text-field
+                            prepend-icon="favorite"
+                            v-model="dBarang.likes"
+                            label="Favorit"
+                            color="red"
+                        ></v-text-field>
+                    </v-card-text>
+                </v-flex>
+                <v-flex xs12 md6>
+                    <v-card-text class="pb-0 pt-0">
+                        <v-text-field
+                            v-model="dBarang.img"
+                            label="Gambar"
+                        ></v-text-field>
+                    </v-card-text>
+                    <v-card-text class="pb-0 pt-0">
+                        <v-text-field
+                            v-model="dBarang.jenis"
+                            label="Jenis"
+                        ></v-text-field>
+                    </v-card-text>
+                    <v-card-text class="pb-0 pt-0">
+                        <v-text-field
+                            v-model="dBarang.perusahaan"
+                            label="Perusahaan"
+                        ></v-text-field>
+                    </v-card-text>
+                    <v-card-text class="pb-0 pt-0">
+                        <v-text-field
+                            v-model="dBarang.detil"
+                            label="Keterangan"
+                        ></v-text-field>
+                    </v-card-text>
+                    <v-card-text class="pb-0 pt-0">
+                        <v-text-field
+                            v-model="dBarang.harga"
+                            label="Harga"
+                        ></v-text-field>
+                    </v-card-text>
+                </v-flex>
+            </v-layout>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn class="blue white--text" @click.stop="setBarang(dBarang)">Set</v-btn>
+            </v-card-actions>
+        </v-card> 
+    </v-dialog>
+</v-content>
