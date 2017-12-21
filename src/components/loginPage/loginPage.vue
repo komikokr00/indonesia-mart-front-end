@@ -25,7 +25,7 @@ export default {
   },
   watch: {
     isAdmin (_val) {
-      if (_val) this.$router.replace('/navibahaya')
+      if (_val) this.$router.replace('/naviadmin')
     },
     currentUser (_val) {
       console.log(_val)
