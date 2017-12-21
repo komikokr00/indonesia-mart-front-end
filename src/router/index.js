@@ -36,7 +36,7 @@ let router = new Router({
       }
     },
     {
-      path: '/bahaya',
+      path: '/login',
       name: 'loginPage',
       component: loginPage
     },
@@ -65,7 +65,7 @@ let router = new Router({
       }
     },
     {
-      path: '/navibahaya',
+      path: '/naviadmin',
       name: 'naviPage',
       component: naviPage,
       meta: {
